@@ -1,21 +1,30 @@
 package org.iesvdm.booking;
 
+
+import static org.assertj.core.api.Assertions.*;
+
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
+
+import java.time.LocalDate;
+import java.util.*;
+
 
 public class BookingDAOTest {
 
+
     private BookingDAO bookingDAO;
     private Map<String, BookingRequest> bookings;
+
 
     @BeforeEach
     public void setup() {
         bookings = new HashMap<>();
         bookingDAO = new BookingDAO(bookings);
     }
+
 
     /**
      * Crea 2 peticiones de reserva (BookingRequest)
@@ -26,8 +35,46 @@ public class BookingDAOTest {
      */
     @Test
     void  getAllBookingRequestsTest() {
+        // Creación de las reservas
+        LocalDate fecha1 = LocalDate.of(2020, 1, 1);
+        LocalDate fecha2 = LocalDate.of(2021, 1, 2);
+        LocalDate fecha3 = LocalDate.of(2022, 1, 3);
+        LocalDate fecha4 = LocalDate.of(2023, 1, 4);
 
+
+        BookingRequest br1 = new BookingRequest("1",fecha1,fecha2,4,false);
+        BookingRequest br2 = new BookingRequest("2",fecha3,fecha4,6,true);
+
+
+        // Añadido al mapa
+        bookings.put(br1.getUserId(), br1);
+        bookings.put(br2.getUserId(), br2);
+
+
+        // Recogida de las reservas
+        Collection<BookingRequest> coleccion = bookingDAO.getAllBookingRequests();
+
+
+        // Comprobación
+        int cont = 1;
+
+
+        Iterator<BookingRequest> iterador = coleccion.iterator();
+        while(iterador.hasNext()){
+            BookingRequest reserva = iterador.next();
+
+
+            if(cont == 1){
+                assertThat(reserva).isEqualTo(br1);
+            } else{
+                assertThat(reserva).isEqualTo(br2);
+            }
+
+
+            cont++;
+        }
     }
+
 
     /**
      * Crea 2 peticiones de reserva (BookingRequest)
@@ -37,8 +84,32 @@ public class BookingDAOTest {
      */
     @Test
     void getAllUUIDsTest() {
+        // Creación de las reservas
+        LocalDate fecha1 = LocalDate.of(2020, 1, 1);
+        LocalDate fecha2 = LocalDate.of(2021, 1, 2);
+        LocalDate fecha3 = LocalDate.of(2022, 1, 3);
+        LocalDate fecha4 = LocalDate.of(2023, 1, 4);
 
+
+        BookingRequest br1 = new BookingRequest("1",fecha1,fecha2,4,false);
+        BookingRequest br2 = new BookingRequest("2",fecha3,fecha4,6,true);
+
+
+        // Añadido al mapa
+        bookingDAO.save(br1);
+        bookingDAO.save(br2);
+
+
+        // Recogida de las claves de la forma del proyecto y de la forma predefinida de Java
+        Set<String> coleccion = bookingDAO.getAllUUIDs();
+        Set<String> claves = bookings.keySet();
+
+
+        // Comprobación
+        assertThat(coleccion).containsAll(claves);
     }
+
+
 
 
     /**
@@ -49,8 +120,40 @@ public class BookingDAOTest {
      */
     @Test
     void getTest() {
+        // Creación de las reservas
+        LocalDate fecha1 = LocalDate.of(2020, 1, 1);
+        LocalDate fecha2 = LocalDate.of(2021, 1, 2);
+        LocalDate fecha3 = LocalDate.of(2022, 1, 3);
+        LocalDate fecha4 = LocalDate.of(2023, 1, 4);
+
+
+        BookingRequest br1 = new BookingRequest("1",fecha1,fecha2,4,false);
+        BookingRequest br2 = new BookingRequest("2",fecha3,fecha4,6,true);
+
+
+        // Añadido al mapa
+        bookingDAO.save(br1);
+        bookingDAO.save(br2);
+
+
+        // Recogida de las claves de la forma predefinida de Java
+        Set<String> claves = bookings.keySet();
+
+
+        // Comprobación
+        Iterator<String> iterador = claves.iterator();
+        while(iterador.hasNext()){
+            String clave = iterador.next();
+
+
+            assertThat(bookingDAO.get(clave)).isEqualTo(bookings.get(clave));
+        }
+
+
+
 
     }
+
 
     /**
      * Crea 2 peticiones de reserva (BookingRequest)
@@ -60,8 +163,25 @@ public class BookingDAOTest {
      */
     @Test
     void deleteTest() {
+        // Creación de las reservas
+        LocalDate fecha1 = LocalDate.of(2020, 1, 1);
+        LocalDate fecha2 = LocalDate.of(2021, 1, 2);
+        LocalDate fecha3 = LocalDate.of(2022, 1, 3);
+        LocalDate fecha4 = LocalDate.of(2023, 1, 4);
+
+
+        BookingRequest br1 = new BookingRequest("1",fecha1,fecha2,4,false);
+        BookingRequest br2 = new BookingRequest("2",fecha3,fecha4,6,true);
+
+
+        // Añadido al mapa
+        bookingDAO.save(br1);
+        bookingDAO.save(br2);
+
+
 
     }
+
 
     /**
      * Guarda 2 veces la misma petición de reserva (BookingRequest)
@@ -72,6 +192,8 @@ public class BookingDAOTest {
     @Test
     void saveTwiceSameBookingRequestTest() {
 
+
     }
+
 
 }
