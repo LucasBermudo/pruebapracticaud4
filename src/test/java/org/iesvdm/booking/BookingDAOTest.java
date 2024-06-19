@@ -179,7 +179,25 @@ public class BookingDAOTest {
         bookingDAO.save(br2);
 
 
+        // Recogida de las claves de la forma predefinida de Java
+        Set<String> claves = bookings.keySet();
 
+        // Eliminación de la 1ª reserva
+        boolean borrado = false;
+
+        Iterator<String> iterador = claves.iterator();
+        while(iterador.hasNext() && !borrado){
+            String clave = iterador.next();
+
+            if(bookingDAO.get(clave).equals(br1)){
+                borrado = true;
+
+                bookingDAO.delete(clave);
+            }
+        }
+
+        // Comprobación
+        assertThat(bookingDAO.getAllBookingRequests()).containsOnly(br2);
     }
 
 
@@ -191,7 +209,40 @@ public class BookingDAOTest {
      */
     @Test
     void saveTwiceSameBookingRequestTest() {
+        // Creación de las reservas
+        LocalDate fecha1 = LocalDate.of(2020, 1, 1);
+        LocalDate fecha2 = LocalDate.of(2021, 1, 2);
 
+
+        BookingRequest br1 = new BookingRequest("1",fecha1,fecha2,4,false);
+
+
+        // Añadido al mapa
+        bookingDAO.save(br1);
+        bookingDAO.save(br1);
+
+        // Recogida de las claves de la forma predefinida de Java
+        int cont = 1;
+        BookingRequest reserva1 = null;
+        String clave1 = null;
+
+        Set<String> claves = bookings.keySet();
+
+        // Comprobación
+        Iterator<String> iterador = claves.iterator();
+        while(iterador.hasNext()){
+            String clave = iterador.next();
+
+            if(cont == 1){
+                reserva1 = bookingDAO.get(clave);
+                clave1 = clave;
+            } else{
+                assertThat(clave).isNotEqualTo(clave1);
+                assertThat(bookingDAO.get(clave)).isEqualTo(reserva1);
+            }
+
+            cont++;
+        }
 
     }
 

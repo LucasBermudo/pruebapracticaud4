@@ -8,6 +8,7 @@ import org.mockito.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +65,19 @@ public class BookingServiceTest {
      */
     @Test
     void getAvailablePlaceCountTest() {
+        Room r1 = new Room("1",2);
+        Room r2 = new Room("2",5);
+        Room r3 = new Room("3",3);
 
+        ArrayList<Room> rooms = new ArrayList<>();
+
+        rooms.add(r1);
+        rooms.add(r2);
+        rooms.add(r3);
+
+        when(roomService.getAvailableRooms()).thenReturn(rooms);
+
+        assertThat(bookingService.getAvailablePlaceCount()).isEqualTo(10);
     }
 
     /**
@@ -75,7 +88,18 @@ public class BookingServiceTest {
      */
      @Test
     void calculatePriceTest() {
+        bookingRequest1.getDateFrom();
+        bookingRequest1.getDateTo();
+        bookingRequest1.getGuestCount();
 
+        verify(bookingRequest1).getDateFrom();
+        verify(bookingRequest1).getDateTo();
+        verify(bookingRequest1).getGuestCount();
+
+        int noches = (int)ChronoUnit.DAYS.between(bookingRequest1.getDateFrom(),bookingRequest1.getDateTo());
+        double precio = 50 * bookingRequest1.getGuestCount() * noches;
+
+        assertThat(bookingService.calculatePrice(bookingRequest1)).isEqualTo(precio);
      }
 
 
@@ -91,7 +115,13 @@ public class BookingServiceTest {
      */
     @Test
     void makeBookingTest1() {
+        when(roomService.findAvailableRoomId(bookingRequest2)).thenReturn("101");
 
+        assertThat(bookingRequest2.isPrepaid()).isTrue();
+
+        bookingService.makeBooking(bookingRequest2);
+
+        verify(paymentService).pay(bookingRequest2, bookingService.calculatePrice(bookingRequest2));
     }
 
     /**
@@ -107,6 +137,9 @@ public class BookingServiceTest {
      */
     @Test
     void makeBookingTest2() {
+        when(roomService.findAvailableRoomId(bookingRequest2)).thenReturn("101");
+
+//        verify()
 
     }
 }
